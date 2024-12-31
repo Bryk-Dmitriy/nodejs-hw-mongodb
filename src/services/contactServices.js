@@ -14,6 +14,10 @@ export const getContacts = async ({
   const limit = perPage;
   const skip = (page - 1) * limit;
 
+  if (filterSettings.userId) {
+    ContactCollection.find().where('userId').equals(filterSettings.userId);
+  }
+
   const items = await ContactCollection.find(filterSettings)
     .sort(sort)
     .skip(skip)
@@ -30,10 +34,12 @@ export const getContacts = async ({
 };
 export const getContactbuId = (id) => ContactCollection.findById(id);
 
+export const getContact = (filter) => ContactCollection.findOne(filter);
+
 export const addContact = (data) => ContactCollection.create(data);
 
-export const cheangeContact = async (_id, data) => {
-  const result = await ContactCollection.findOneAndUpdate({ _id }, data);
+export const cheangeContact = async (filter, data) => {
+  const result = await ContactCollection.findOneAndUpdate(filter, data);
 
   if (!result) return null;
   return { data: result };
