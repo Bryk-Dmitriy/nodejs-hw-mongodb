@@ -45,4 +45,5 @@ export const cheangeContact = async (filter, data) => {
   return { data: result };
 };
 
-export const deleteContact = (id) => ContactCollection.findOneAndDelete(id);
+export const deleteContact = (filter) =>
+  ContactCollection.findOneAndDelete(filter);
