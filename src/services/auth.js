@@ -1,5 +1,7 @@
 import { userCollection } from '../db/models/User.js';
 import SessionCollection from '../db/models/Session.js';
+import { createToken, verifyToken } from '../utils/jwtConfig.js';
+import { transporter, FROM_EMAIL } from '../utils/sendEmail.js';
 
 import createError from 'http-errors';
 
@@ -90,3 +92,36 @@ export const logoutService = async (sessionId) => {
 export const getUser = (filter) => userCollection.findOne(filter);
 
 export const getSession = (filter) => SessionCollection.findOne(filter);
+
+export const sendResetPassword = async (email) => {
+  const user = await userCollection.findOne({ email });
+  if (!user) {
+    throw createError(404, 'User not found!');
+  }
+
+  const token = createToken({ email }, '5m');
+  const resetLink = `${process.env.APP_DOMAIN}/reset-password?token=${token}`;
+
+  try {
+    await transporter.sendMail({
+      from: FROM_EMAIL,
+      to: email,
+      subject: 'Password Reset Request',
+      html: `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`,
+    });
+  } catch (error) {
+    throw createError(500, 'Failed to send the email, please try again later.');
+  }
+};
+
+export const resetPassword = async (token, newPassword) => {
+  const payload = verifyToken(token);
+  const user = await userCollection.findOne({ email: payload.email });
+  if (!user) {
+    throw createError(404, 'User not found!');
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  user.password = hashedPassword;
+  await user.save();
+};
