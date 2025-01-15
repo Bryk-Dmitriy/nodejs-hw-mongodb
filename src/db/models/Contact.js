@@ -23,6 +23,7 @@ const contactSchema = new Schema(
       ref: 'user',
       required: true,
     },
+    photo: String,
   },
   { timestamps: true, versionKey: false },
 );

@@ -14,6 +14,10 @@ import { sortParams } from '../utils/sortParams.js';
 
 import { filter } from '../utils/filter.js';
 
+// import { saveFileToUploads } from '../utils/saveFileToUploads.js';
+
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+
 export const getContactController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
 
@@ -54,9 +58,14 @@ export const getContactbyIdController = async (req, res) => {
 };
 
 export const postContactController = async (req, res) => {
+  let photo;
+  if (req.file) {
+    photo = await saveFileToCloudinary(req.file);
+  }
+
   const { _id: userId } = req.user;
 
-  const data = await addContact({ ...req.body, userId });
+  const data = await addContact({ ...req.body, photo, userId });
 
   res.status(201).json({
     status: 201,
@@ -66,9 +75,20 @@ export const postContactController = async (req, res) => {
 };
 
 export const patchContactController = async (req, res) => {
+  let photo;
+  if (req.file) {
+    photo = await saveFileToCloudinary(req.file);
+  }
+
   const { id: _id } = req.params;
   const { _id: userId } = req.user;
-  const result = await cheangeContact({ _id, userId }, req.body);
+
+  const updateContact = { ...req.body };
+  if (photo) {
+    updateContact.photo = photo;
+  }
+
+  const result = await cheangeContact({ _id, userId }, updateContact);
 
   if (!result) {
     throw createError(404, `Contact with id${_id} not found`);
