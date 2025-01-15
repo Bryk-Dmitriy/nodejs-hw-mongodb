@@ -4,14 +4,14 @@ import { unlink } from 'node:fs/promises';
 
 import { getEnvVar } from './getEnvVar.js';
 
-const cloudName = getEnvVar('CLOUNDARY_NAME');
-const cloudKey = getEnvVar('CLOUNDARY_API');
-const cloudPassword = getEnvVar('CLOUNDARY_PASSWORD');
+const cloud_name = getEnvVar('CLOUDINARY_CLOUD_NAME');
+const api_key = getEnvVar('CLOUDINARY_API_KEY');
+const api_secret = getEnvVar('CLOUDINARY_API_SECRET');
 
 cloudinary.config({
-  cloud_name: cloudName,
-  api_key: cloudKey,
-  api_secret: cloudPassword,
+  cloud_name,
+  api_key,
+  api_secret,
 });
 
 export const saveFileToCloudinary = async (file) => {
