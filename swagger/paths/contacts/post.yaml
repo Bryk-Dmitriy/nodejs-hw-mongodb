@@ -1,0 +1,63 @@
+tags:
+  - Contacts
+summary: Create a contact
+operationId: createContact
+description: Endpoint for create a new contact.
+security:
+  - bearerAuth: []
+requestBody:
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        required:
+          - name
+          - phoneNumber
+        properties:
+          name:
+            description: 'Contact name'
+            type: string
+            example: 'Jon Snow'
+          email:
+            description: 'Contact email'
+            type: string
+            example: 'snowball@mail.com'
+          phoneNumber:
+            description: 'Contact number'
+            type: string
+            example: '380509777555'
+          contactType:
+            description: 'Contact type'
+            type: string
+            example: 'personal'
+            enum: ['personal', 'home', 'work']
+          isFavourite:
+            description: 'Favourite contact'
+            type: boolean
+          photo:
+            description: 'Contact photo'
+            type: string
+            format: binary
+responses:
+  '201':
+    description: 'Create contact'
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: 'Contact successfully created'
+            data:
+              type: object
+              $ref: ../../components/schemas/contactSchema.yaml
+  '401':
+    $ref: ../../components/responses/unauthorizedError.yaml
